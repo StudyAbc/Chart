@@ -31,12 +31,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initBarChart(BarChart barChart) {
+        int size = 30;
         List<Double> yList = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < size; i++) {
             yList.add(10.1 + Math.random() * 100);
         }
         List<String> xAxisList = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < size; i++) {
             xAxisList.add("部门" + i);
         }
 //        LineData lineData = new LineData("name", "元", yList);
@@ -52,20 +53,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initChart(LineChart lineChart) {
+        int size = 15;
         List<Double> yList = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < size; i++) {
             yList.add(10.1 + Math.random() * 100);
         }
-        yList.add(0.0);
-        yList.add(10.0);
-        yList.add(20.0);
-        yList.add(30.0);
-        yList.add(40.0);
-        yList.add(50.0);
-        yList.add(60.0);
-        yList.add(40.0);
+//        yList.add(0.0);
+//        yList.add(10.0);
+//        yList.add(20.0);
+//        yList.add(30.0);
+//        yList.add(40.0);
+//        yList.add(50.0);
+//        yList.add(60.0);
+//        yList.add(40.0);
         List<String> xAxisList = new ArrayList<>();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < size; i++) {
             xAxisList.add("部门" + i);
         }
 //        LineData lineData = new LineData("name", "元", yList);
@@ -75,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setShowXScaleLine(true);
         lineChart.setShowYScaleLine(true);
         lineChart.setYScaleSize(10);
+
         lineChart.setLineModel(LineChart.CURVE_MODEL);
         lineChart.setShowPoint(true);
         lineChart.setChartData(chartData);

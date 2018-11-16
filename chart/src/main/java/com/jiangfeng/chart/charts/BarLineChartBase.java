@@ -12,12 +12,14 @@ import com.jiangfeng.chart.component.XAxis;
 import com.jiangfeng.chart.component.YAxis;
 import com.jiangfeng.chart.data.ChartData;
 import com.jiangfeng.chart.data.ColumnData;
+import com.jiangfeng.chart.listener.OnChartChangeListener;
+import com.jiangfeng.chart.matrix.MatrixHelper;
 import com.jiangfeng.chart.util.DensityUtil;
 
 /**
  * 线形图和柱状图的父类;
  */
-public abstract class BarLineChartBase<T extends ColumnData> extends View implements IProvider {
+public abstract class BarLineChartBase<T extends ColumnData> extends View implements IProvider, OnChartChangeListener {
     /**
      * 横坐标轴
      */
@@ -55,6 +57,10 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
      * 显示坐标点
      */
     private boolean mShowPoint;
+    /**
+     * 手势辅助类
+     */
+    private MatrixHelper mMatrixHelper;
 
     public BarLineChartBase(Context context) {
         super(context);
@@ -78,6 +84,8 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
         mChartRect = new Rect();
         mContext = context;
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        mMatrixHelper = new MatrixHelper(context);
+        mMatrixHelper.setOnChartChangeListener(this);
     }
 
     @Override
@@ -103,6 +111,19 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if(changed){
+
+        }
+        super.onLayout(changed, left, top, right, bottom);
+    }
+
+    @Override
     public void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData chartData) {
         drawProviderValue(canvas, paint, chartRect, chartData);
     }
@@ -117,10 +138,6 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
      */
     abstract void drawProviderValue(Canvas canvas, Paint paint, Rect chartRect, ChartData chartData);
 
-    public void setChartData(ChartData<T> chartData) {
-        this.mChartData = chartData;
-        invalidate();
-    }
 
     /**
      * 尺寸变化
@@ -138,25 +155,6 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
     }
 
     /**
-     * 计算图表区域
-     */
-    private void computeChartRect() {
-        mChartRect.left = mPadding;
-        mChartRect.top = mPadding;
-        mChartRect.right = mChartWidth - mPadding;
-        mChartRect.bottom = mChartHeight - mPadding;
-    }
-
-    /**
-     * 设置图表内边距 dp
-     *
-     * @param padding 内边距
-     */
-    public void setPadding(int padding) {
-        this.mPadding = DensityUtil.dp2px(mContext, padding);
-    }
-
-    /**
      * 触摸事件
      *
      * @param event 事件
@@ -164,10 +162,38 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return super.onTouchEvent(event);
+//        mMatrixHelper.handlerTouchEvent(event);
+        //该View获得事件时，请求父控件不拦截事件;
+        getParent().requestDisallowInterceptTouchEvent(true);
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+
+                break;
+            case MotionEvent.ACTION_MOVE:
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+
+                break;
+            case MotionEvent.ACTION_CANCEL:
+
+                break;
+            default:
+                break;
+        }
+        return true;
 
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        return super.dispatchTouchEvent(event);
+    }
+
+    @Override
+    public void onChartChange(float translateX, float translateY) {
+        invalidate();
+    }
 
     public void setShowXScaleLine(boolean showXScaleLine) {
         mXAxis.setShowXScaleLine(showXScaleLine);
@@ -193,4 +219,29 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
     public void setShowPoint(boolean showPoint) {
         this.mShowPoint = showPoint;
     }
+
+    public void setChartData(ChartData<T> chartData) {
+        this.mChartData = chartData;
+        invalidate();
+    }
+
+    /**
+     * 计算图表区域
+     */
+    private void computeChartRect() {
+        mChartRect.left = mPadding;
+        mChartRect.top = mPadding;
+        mChartRect.right = mChartWidth - mPadding;
+        mChartRect.bottom = mChartHeight - mPadding;
+    }
+
+    /**
+     * 设置图表内边距 dp
+     *
+     * @param padding 内边距
+     */
+    public void setPadding(int padding) {
+        this.mPadding = DensityUtil.dp2px(mContext, padding);
+    }
+
 }

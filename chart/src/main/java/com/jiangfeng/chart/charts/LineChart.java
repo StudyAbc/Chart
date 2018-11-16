@@ -35,10 +35,6 @@ public class LineChart extends BarLineChartBase<LineData> {
      * 线模式
      */
     private int lineModel;
-    /**
-     * 曲线曲率
-     */
-    private float curvatrue = 0.35f;
 
     public LineChart(Context context) {
         super(context);

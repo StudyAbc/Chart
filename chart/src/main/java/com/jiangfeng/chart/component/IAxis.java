@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import com.jiangfeng.chart.data.ChartData;
 import com.jiangfeng.chart.data.ColumnData;
 import com.jiangfeng.chart.data.format.IFormat;
+import com.jiangfeng.chart.matrix.MatrixHelper;
 
 public interface IAxis<T> {
     /**
@@ -23,7 +24,7 @@ public interface IAxis<T> {
      * @param canvas 画布
      * @param paint  画笔
      */
-    void drawScaleText(Canvas canvas, Paint paint, Rect chartRect, ChartData<ColumnData> chartData);
+    void drawScaleText(Canvas canvas, Paint paint, Rect chartRect,MatrixHelper helper, ChartData<ColumnData> chartData);
 
     /**
      * 绘制刻度线
@@ -33,7 +34,7 @@ public interface IAxis<T> {
      * @param chartRect 图表范围
      * @param chartData 图表数据
      */
-    void drawScaleLine(Canvas canvas, Paint paint, Rect chartRect, ChartData<ColumnData> chartData);
+    void drawScaleLine(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper, ChartData<ColumnData> chartData);
 
     /**
      * 设置格式化

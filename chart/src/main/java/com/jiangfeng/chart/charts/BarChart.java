@@ -41,7 +41,7 @@ public class BarChart extends BarLineChartBase {
         //Y轴数据
         List<Double> columnDataList = chartData.getColumnDataList();
         //X轴显示列数
-        int xSize = chartData.getxDataList().size();
+        int xSize = mXAxis.getxScaleSize();
         //X轴单位宽度
         double perWidth = (chartRect.right - chartRect.left) / (mXAxis.isLine() ? xSize - 1 : xSize);
         //点的样式

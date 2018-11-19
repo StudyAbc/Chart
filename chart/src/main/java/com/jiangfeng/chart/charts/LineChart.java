@@ -53,7 +53,8 @@ public class LineChart extends BarLineChartBase<LineData> {
         //Y轴数据
         List<Double> columnDataList = chartData.getColumnDataList();
         //X轴显示列数
-        int xSize = chartData.getxDataList().size();
+        int xSize = mXAxis.getxScaleSize();
+        chartRect=getMatrixHelper().getZoomRect(chartRect);
         //X轴单位宽度
         double perWidth = (chartRect.right - chartRect.left) / (mXAxis.isLine() ? xSize - 1 : xSize);
         //点的样式
@@ -66,7 +67,7 @@ public class LineChart extends BarLineChartBase<LineData> {
         for (int i = 0; i < columnDataList.size(); i++) {
             //从第1列开始绘制坐标点
             int startIndex = i + 1;
-            int xCurrent = (int) (mXAxis.getxZero() + startIndex * perWidth);
+            int xCurrent = (int) (chartRect.left + startIndex * perWidth);
             //数据Y坐标
             int yCurrent = (int) (mXAxis.getyZero() - mYAxis.getYHeightByVlaue(chartData, chartRect, columnDataList.get(i)));
             //绘制数值位置
@@ -87,7 +88,7 @@ public class LineChart extends BarLineChartBase<LineData> {
             //绘制折线和曲线
             if (i < columnDataList.size() - 1) {
                 //下一个坐标点
-                int xNext = (int) (mXAxis.getxZero() + (startIndex + 1) * perWidth);
+                int xNext = (int) (chartRect.left + (startIndex + 1) * perWidth);
                 int yNext = (int) (mXAxis.getyZero() - mYAxis.getYHeightByVlaue(chartData, chartRect, columnDataList.get(i + 1)));
                 if (lineModel == LINE_MODEL) {
                     canvas.drawLine(xCurrent, yCurrent, xNext, yNext, lineStyle.fillPaint(paint));

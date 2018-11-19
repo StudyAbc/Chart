@@ -115,6 +115,14 @@ public abstract class AxisBase<T> implements IAxis<T> {
         this.yScaleSize = yScaleSize;
     }
 
+    public int getxScaleSize() {
+        return xScaleSize;
+    }
+
+    public void setxScaleSize(int xScaleSize) {
+        this.xScaleSize = xScaleSize;
+    }
+
     public float getxZero() {
         return xZero;
     }

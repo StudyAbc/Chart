@@ -8,6 +8,7 @@ import android.graphics.Rect;
 
 import com.jiangfeng.chart.data.ChartData;
 import com.jiangfeng.chart.data.ScaleData;
+import com.jiangfeng.chart.matrix.MatrixHelper;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
@@ -24,14 +25,14 @@ public class YAxis extends AxisBase<Double> {
 
     @Override
     public void drawAxis(Canvas canvas, Paint paint, Rect rect, ChartData chartData) {
-        float textHeight = getTextHeight(getScaleTextStyle().fillPaint(paint));
+        float textHeight = getTextHeight(getScaleTextStyle().setTextSize(36).fillPaint(paint));
         xZero = rect.left + textHeight;
         yZero = (int) (rect.bottom - textHeight);
         canvas.drawLine(xZero, yZero, rect.left + textHeight, rect.top, getAxisStyle().fillPaint(paint));
     }
 
     @Override
-    public void drawScaleText(Canvas canvas, Paint paint, Rect chartRect, ChartData chartData) {
+    public void drawScaleText(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper, ChartData chartData) {
         int perHeight = (int) (getYAxisHeight(chartRect) / getyScaleSize());
         ScaleData scaleData = chartData.getScaleData();
         List<Double> columnDataList = chartData.getColumnDataList();
@@ -53,7 +54,7 @@ public class YAxis extends AxisBase<Double> {
 
 
     @Override
-    public void drawScaleLine(Canvas canvas, Paint paint, Rect chartRect, ChartData chartData) {
+    public void drawScaleLine(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper,ChartData chartData) {
         int perHeight = (int) (getYAxisHeight(chartRect) / getyScaleSize());
 //        //刻度的范围
 //        ScaleData scaleData = chartData.getScaleData();

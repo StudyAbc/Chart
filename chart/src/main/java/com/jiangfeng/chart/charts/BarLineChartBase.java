@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -20,6 +21,7 @@ import com.jiangfeng.chart.util.DensityUtil;
  * 线形图和柱状图的父类;
  */
 public abstract class BarLineChartBase<T extends ColumnData> extends View implements IProvider, OnChartChangeListener {
+    private final String TAG = BarLineChartBase.class.getName();
     /**
      * 横坐标轴
      */
@@ -86,6 +88,8 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         mMatrixHelper = new MatrixHelper(context);
         mMatrixHelper.setOnChartChangeListener(this);
+
+
     }
 
     @Override
@@ -95,15 +99,15 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
             computeChartRect();
             //绘制坐标轴
             mXAxis.drawAxis(canvas, mPaint, mChartRect, mChartData);
-            mXAxis.drawScaleText(canvas, mPaint, mChartRect, mChartData);
+            mXAxis.drawScaleText(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
             if (mXAxis.isShowXScaleLine()) {
-                mXAxis.drawScaleLine(canvas, mPaint, mChartRect, mChartData);
+                mXAxis.drawScaleLine(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
             }
             //设置Y轴刻度线条数
             mYAxis.drawAxis(canvas, mPaint, mChartRect, mChartData);
-            mYAxis.drawScaleText(canvas, mPaint, mChartRect, mChartData);
+            mYAxis.drawScaleText(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
             if (mYAxis.isShowYScaleLine()) {
-                mYAxis.drawScaleLine(canvas, mPaint, mChartRect, mChartData);
+                mYAxis.drawScaleLine(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
             }
             //绘制坐标点，和图表
             drawProvider(canvas, mPaint, mChartRect, mChartData);
@@ -117,7 +121,7 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if(changed){
+        if (changed) {
 
         }
         super.onLayout(changed, left, top, right, bottom);
@@ -162,36 +166,20 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//        mMatrixHelper.handlerTouchEvent(event);
-        //该View获得事件时，请求父控件不拦截事件;
-        getParent().requestDisallowInterceptTouchEvent(true);
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
+        mMatrixHelper.handlerTouchEvent(event);
 
-                break;
-            case MotionEvent.ACTION_MOVE:
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-
-                break;
-            case MotionEvent.ACTION_CANCEL:
-
-                break;
-            default:
-                break;
-        }
         return true;
-
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        mMatrixHelper.onDisallowInterceptEvent(this, event);
         return super.dispatchTouchEvent(event);
     }
 
     @Override
     public void onChartChange(float translateX, float translateY) {
+        Log.i(TAG, "--translateX:" + translateX + "--translteY:" + translateY);
         invalidate();
     }
 
@@ -201,6 +189,10 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
 
     public void setShowYScaleLine(boolean showYScaleLine) {
         mYAxis.setShowYScaleLine(showYScaleLine);
+    }
+
+    public void setXScaleSize(int xScaleSize) {
+        mXAxis.setxScaleSize(xScaleSize);
     }
 
     /**
@@ -244,4 +236,11 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
         this.mPadding = DensityUtil.dp2px(mContext, padding);
     }
 
+    public void setZoom(boolean isZoom) {
+        mMatrixHelper.setZoom(isZoom);
+    }
+
+    public MatrixHelper getMatrixHelper(){
+        return mMatrixHelper;
+    }
 }

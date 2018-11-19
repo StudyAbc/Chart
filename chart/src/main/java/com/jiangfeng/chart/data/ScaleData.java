@@ -40,6 +40,14 @@ public class ScaleData {
         return rect;
     }
 
+    public Rect getOffsetRect(Rect rect, Rect offsetRect) {
+        rect.left = rect.left + offsetRect.left;
+        rect.right = rect.right - offsetRect.right;
+        rect.top = rect.top + offsetRect.top;
+        rect.bottom = rect.bottom - offsetRect.bottom;
+        return rect;
+    }
+
     public void setRect(Rect rect) {
         this.rect = rect;
     }

@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initBarChart(BarChart barChart) {
-        int size = 30;
+        int size = 10;
         List<Double> yList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             yList.add(10.1 + Math.random() * 100);
@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         barChart.setYScaleSize(6);
         barChart.setShowPoint(true);
         barChart.setShowLine(true);
+        barChart.getMatrixHelper().setWidthMultiple(2f);
         barChart.setChartData(chartData);
     }
 
@@ -76,8 +77,10 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setPadding(20);
         lineChart.setShowXScaleLine(true);
         lineChart.setShowYScaleLine(true);
+        lineChart.setXScaleSize(10);
         lineChart.setYScaleSize(10);
-
+        lineChart.setZoom(true);
+        lineChart.getMatrixHelper().setWidthMultiple(2f);
         lineChart.setLineModel(LineChart.CURVE_MODEL);
         lineChart.setShowPoint(true);
         lineChart.setChartData(chartData);

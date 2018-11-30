@@ -35,10 +35,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * git
-     * @param barChart
-     */
     private void initBarChart(BarChart barChart) {
         int size = 20;
         List<Double> yList = new ArrayList<>();

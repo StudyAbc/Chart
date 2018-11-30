@@ -20,7 +20,7 @@ import java.util.List;
  * 2018/11/16 10:17
  * 折线图和曲线图
  */
-public class LineChart extends BarLineChartBase<Double> {
+public class LineChart extends BarLineChartBase<Double> implements IProvider<Double> {
     private final String TAG = LineChart.class.getName();
     /**
      * 折线图
@@ -47,9 +47,14 @@ public class LineChart extends BarLineChartBase<Double> {
         super(context, attrs, defStyleAttr);
     }
 
+    @Override
+    IProvider<Double> initProvider() {
+        return this;
+    }
+
 
     @Override
-    void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData<Double> chartData) {
+    public void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData<Double> chartData) {
         //Y轴数据
         List<Double> columnDataList = chartData.getColumnDataList();
         //X轴显示列数

@@ -1,12 +1,12 @@
 package com.jiangfeng.demo;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.jiangfeng.chart.charts.BarChart;
 import com.jiangfeng.chart.charts.LineChart;
+import com.jiangfeng.chart.charts.PieChart;
 import com.jiangfeng.chart.data.ChartData;
 import com.jiangfeng.chart.listener.OnClickColumnListener;
 
@@ -16,6 +16,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private BarChart mBarChart;
     private LineChart mLineChart;
+    private PieChart mPieChart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,8 +26,10 @@ public class MainActivity extends AppCompatActivity {
         try {
             mBarChart = findViewById(R.id.main_barChart);
             mLineChart = findViewById(R.id.main_lineChart);
+            mPieChart = findViewById(R.id.main_pieChart);
             initBarChart(mBarChart);
             initChart(mLineChart);
+            initPieChart(mPieChart);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,5 +84,19 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setLineModel(LineChart.CURVE_MODEL);
         lineChart.setShowPointValue(true);
         lineChart.setChartData(chartData);
+    }
+
+    private void initPieChart(PieChart pieChart) {
+        int size = 15;
+        List<Double> yList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            yList.add(10.1 + Math.random() * 100);
+        }
+        List<String> xAxisList = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            xAxisList.add("部门" + i);
+        }
+        ChartData<Double> chartData = new ChartData<>("营收报表", xAxisList, yList);
+        pieChart.setChartData(chartData);
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 柱状图
  */
-public class BarChart extends BarLineChartBase<Double> {
+public class BarChart extends BarLineChartBase<Double> implements IProvider<Double> {
     private final String TAG = BarChart.class.getName();
     /**
      * 显示曲线
@@ -35,7 +35,12 @@ public class BarChart extends BarLineChartBase<Double> {
     }
 
     @Override
-    void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData<Double> chartData) {
+    IProvider<Double> initProvider() {
+        return this;
+    }
+
+    @Override
+    public void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData<Double> chartData) {
         //Y轴数据
         List<Double> columnDataList = chartData.getColumnDataList();
         //X轴显示列数

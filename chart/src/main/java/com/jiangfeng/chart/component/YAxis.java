@@ -8,6 +8,8 @@ import android.graphics.Rect;
 
 import com.jiangfeng.chart.data.ChartData;
 import com.jiangfeng.chart.data.ScaleData;
+import com.jiangfeng.chart.data.style.FontStyle;
+import com.jiangfeng.chart.data.style.LineStyle;
 import com.jiangfeng.chart.matrix.MatrixHelper;
 
 import java.text.DecimalFormat;
@@ -32,43 +34,32 @@ public class YAxis extends AxisBase<Double> {
     }
 
     @Override
-    public void drawScaleText(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper, ChartData chartData) {
+    public void drawScale(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper, ChartData chartData) {
         int perHeight = (int) (getYAxisHeight(chartRect) / getyScaleSize());
         ScaleData scaleData = chartData.getScaleData();
         List<Double> columnDataList = chartData.getColumnDataList();
         scaleData.setMinY(Collections.min(columnDataList));
         scaleData.setMaxY(Collections.max(columnDataList));
-        int xStart = chartRect.left;
+        FontStyle scaleTextStyle = getScaleTextStyle();
+        LineStyle gridStyle = getGridStyle();
+        gridStyle.setWidth(2).setColor(Color.parseColor("#d8631b"))
+                .setEffect(new DashPathEffect(new float[]{1, 2, 4, 8}, 0));
         for (int i = 0; i <= getyScaleSize(); i++) {
             //平均Y轴刻度
             String yScale = formatData((scaleData.getMaxY() / getyScaleSize()) * i);
+            int xStart = (int) (xZero - paint.measureText(yScale));
             //Y轴坐标=图表底部坐标-行高-文字高度;
             int yStart = (int) (yZero - i * perHeight);
-            canvas.drawText(yScale, xStart, yStart, getScaleTextStyle().fillPaint(paint));
-        }
-
-//        scaleData.getMaxY() / getyScaleSize() / getYAxisHeight(chartRect) / getyScaleSize() = value / h;
-//        scaleData.getMaxY() / getYAxisHeight(chartRect) = value / h;
-//        h = getYAxisHeight(chartRect) * value / scaleData.getMaxY();
-    }
-
-
-    @Override
-    public void drawScaleLine(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper,ChartData chartData) {
-        int perHeight = (int) (getYAxisHeight(chartRect) / getyScaleSize());
-//        //刻度的范围
-//        ScaleData scaleData = chartData.getScaleData();
-//        scaleData.getRect().bottom = (int) getTextHeight(getScaleTextStyle().fillPaint(paint));
-        paint.setStrokeWidth(1);
-        paint.setColor(Color.parseColor("#bf68c7"));
-//        Log.i(TAG, "--height:" + getYAxisHeight(chartRect) + "--size:" + getyScaleSize() + "--perHeight:" + perHeight);
-        for (int position = 1; position <= getyScaleSize(); position++) {
-            int yStart = (int) (yZero - position * perHeight);
+            canvas.drawText(yScale, xStart, yStart, scaleTextStyle.fillPaint(paint));
             //虚线绘制
-            paint.setPathEffect(new DashPathEffect(new float[]{1, 2, 4, 8}, 0));
-            canvas.drawLine(xZero, yStart, chartRect.right, yStart, paint);
+            if (isShowYScaleLine()) {
+                canvas.drawLine(xZero, yStart, chartRect.right, yStart, gridStyle.fillPaint(paint));
+            }
         }
+//        Log.i(TAG, "--height:" + getYAxisHeight(chartRect) + "--size:" + getyScaleSize() + "--perHeight:" + perHeight);
+
     }
+
 
     /**
      * 计算Y轴数值对应的高度
@@ -78,7 +69,7 @@ public class YAxis extends AxisBase<Double> {
      * @param value     坐标点数值
      * @return Y轴的高度
      */
-    public float getYHeightByVlaue(ChartData chartData, Rect chartRect, double value) {
+    public float getYHeightByValue(ChartData chartData, Rect chartRect, double value) {
         return (float) (getYAxisHeight(chartRect) * value / chartData.getScaleData().getMaxY());
     }
 

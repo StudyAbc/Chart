@@ -3,7 +3,10 @@ package com.jiangfeng.chart.data;
 import android.graphics.Rect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by LWH
@@ -32,6 +35,7 @@ public class ScaleData {
      */
     private Rect rect;
     private List<Double> scaleList;
+    private Map<Integer, Rect> scaleRectMap = new TreeMap<>();
 
     public Rect getRect() {
         if (rect == null) {
@@ -93,5 +97,13 @@ public class ScaleData {
 
     public void setScaleList(List<Double> scaleList) {
         this.scaleList = scaleList;
+    }
+
+    public Map<Integer, Rect> getScaleRectMap() {
+        return scaleRectMap;
+    }
+
+    public void setScaleRectMap(Map<Integer, Rect> scaleRectMap) {
+        this.scaleRectMap = scaleRectMap;
     }
 }

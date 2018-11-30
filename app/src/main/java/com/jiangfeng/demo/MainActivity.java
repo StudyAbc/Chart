@@ -1,12 +1,14 @@
 package com.jiangfeng.demo;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.jiangfeng.chart.charts.BarChart;
 import com.jiangfeng.chart.charts.LineChart;
 import com.jiangfeng.chart.data.ChartData;
-import com.jiangfeng.chart.data.LineData;
+import com.jiangfeng.chart.listener.OnClickColumnListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initBarChart(BarChart barChart) {
-        int size = 10;
+        int size = 20;
         List<Double> yList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             yList.add(10.1 + Math.random() * 100);
@@ -40,17 +42,22 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < size; i++) {
             xAxisList.add("部门" + i);
         }
-//        LineData lineData = new LineData("name", "元", yList);
-        ChartData<LineData> chartData = new ChartData("营收报表", xAxisList, yList);
+        final ChartData<Double> chartData = new ChartData<>("营收报表", xAxisList, yList);
         //图表外边距
         barChart.setPadding(20);
         barChart.setShowXScaleLine(true);
         barChart.setShowYScaleLine(true);
+        barChart.setXScaleSize(10);
         barChart.setYScaleSize(6);
-        barChart.setShowPoint(true);
+        barChart.setShowPointValue(true);
         barChart.setShowLine(true);
-        barChart.getMatrixHelper().setWidthMultiple(2f);
         barChart.setChartData(chartData);
+        barChart.setOnClickColumnListener(new OnClickColumnListener<Double>() {
+            @Override
+            public void onClickColumn(int position, String columnName, Double columnData) {
+                Toast.makeText(getBaseContext(), "position:" + position + "name:" + columnName + "columnData:" + columnData, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void initChart(LineChart lineChart) {
@@ -59,30 +66,20 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < size; i++) {
             yList.add(10.1 + Math.random() * 100);
         }
-//        yList.add(0.0);
-//        yList.add(10.0);
-//        yList.add(20.0);
-//        yList.add(30.0);
-//        yList.add(40.0);
-//        yList.add(50.0);
-//        yList.add(60.0);
-//        yList.add(40.0);
         List<String> xAxisList = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             xAxisList.add("部门" + i);
         }
-//        LineData lineData = new LineData("name", "元", yList);
-        ChartData<LineData> chartData = new ChartData("营收报表", xAxisList, yList);
+        ChartData<Double> chartData = new ChartData<>("营收报表", xAxisList, yList);
         //图表外边距
-        lineChart.setPadding(20);
+        lineChart.setPadding(25);
         lineChart.setShowXScaleLine(true);
         lineChart.setShowYScaleLine(true);
-        lineChart.setXScaleSize(10);
+        lineChart.setXScaleSize(5);
         lineChart.setYScaleSize(10);
         lineChart.setZoom(true);
-        lineChart.getMatrixHelper().setWidthMultiple(2f);
         lineChart.setLineModel(LineChart.CURVE_MODEL);
-        lineChart.setShowPoint(true);
+        lineChart.setShowPointValue(true);
         lineChart.setChartData(chartData);
     }
 }

@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.jiangfeng.chart.data.ChartData;
-import com.jiangfeng.chart.data.LineData;
 import com.jiangfeng.chart.data.style.FontStyle;
 import com.jiangfeng.chart.data.style.LineStyle;
 
@@ -21,7 +20,7 @@ import java.util.List;
  * 2018/11/16 10:17
  * 折线图和曲线图
  */
-public class LineChart extends BarLineChartBase<LineData> {
+public class LineChart extends BarLineChartBase<Double> {
     private final String TAG = LineChart.class.getName();
     /**
      * 折线图
@@ -48,15 +47,16 @@ public class LineChart extends BarLineChartBase<LineData> {
         super(context, attrs, defStyleAttr);
     }
 
+
     @Override
-    void drawProviderValue(Canvas canvas, Paint paint, Rect chartRect, ChartData chartData) {
+    void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData<Double> chartData) {
         //Y轴数据
         List<Double> columnDataList = chartData.getColumnDataList();
         //X轴显示列数
         int xSize = mXAxis.getxScaleSize();
-        chartRect=getMatrixHelper().getZoomRect(chartRect);
+        Rect zoomRect = getMatrixHelper().getZoomRect(chartRect, xSize, chartData.getxDataList().size());
         //X轴单位宽度
-        double perWidth = (chartRect.right - chartRect.left) / (mXAxis.isLine() ? xSize - 1 : xSize);
+        double perWidth = (chartRect.right - chartRect.left) / xSize;
         //点的样式
         FontStyle pointStyle = new FontStyle();
         pointStyle.setTextColor(Color.RED).setWidth(10f);
@@ -67,49 +67,50 @@ public class LineChart extends BarLineChartBase<LineData> {
         for (int i = 0; i < columnDataList.size(); i++) {
             //从第1列开始绘制坐标点
             int startIndex = i + 1;
-            int xCurrent = (int) (chartRect.left + startIndex * perWidth);
+            int xCurrent = (int) (zoomRect.left + startIndex * perWidth);
             //数据Y坐标
-            int yCurrent = (int) (mXAxis.getyZero() - mYAxis.getYHeightByVlaue(chartData, chartRect, columnDataList.get(i)));
+            int yCurrent = (int) (zoomRect.bottom - mYAxis.getYHeightByValue(chartData, zoomRect, columnDataList.get(i)));
             //绘制数值位置
-            canvas.drawPoint(xCurrent, yCurrent, pointStyle.fillPaint(paint));
-//            mYAxis.setFormat(new IFormat<Double>() {
-//                @Override
-//                public String format(Double aDouble) {
-//                    return null;
-//                }
-//            });
-            //绘制文本
-            if (isShowPoint()) {
-                String content = mYAxis.formatData(columnDataList.get(i));
-                pointStyle.setTextSize(24);
-                //X坐标=坐标点-文本宽度/2；Y坐标=坐标点-文本高度/2；
-                canvas.drawText(content, xCurrent - pointStyle.fillPaint(paint).measureText(content) / 2, yCurrent - textHeight / 2, pointStyle.fillPaint(paint));
-            }
-            //绘制折线和曲线
-            if (i < columnDataList.size() - 1) {
-                //下一个坐标点
-                int xNext = (int) (chartRect.left + (startIndex + 1) * perWidth);
-                int yNext = (int) (mXAxis.getyZero() - mYAxis.getYHeightByVlaue(chartData, chartRect, columnDataList.get(i + 1)));
-                if (lineModel == LINE_MODEL) {
-                    canvas.drawLine(xCurrent, yCurrent, xNext, yNext, lineStyle.fillPaint(paint));
-                } else if (lineModel == CURVE_MODEL) {
-                    //中心点
-                    int xMid = (xCurrent + xNext) / 2;
-                    Path path = new Path();
-                    path.moveTo(xCurrent, yCurrent);
-                    path.cubicTo(xMid, yCurrent, xMid, yNext, xNext, yNext);
-                    canvas.drawPath(path, lineStyle.fillPaint(paint));
-                } else {
-                    Log.i(LineChart.class.getName(), "lineModel=" + lineModel + " is unknown");
+            if (xCurrent > mXAxis.getxZero() && xCurrent <= chartRect.right) {
+                int pointColor = chartData.getColors()[i % chartData.getColors().length];
+                if (isShowPoint()) {
+                    pointStyle.setTextColor(pointColor);
+                    canvas.drawPoint(xCurrent, yCurrent, pointStyle.fillPaint(paint));
+                }
+                //绘制文本
+                if (isShowPointValue()) {
+                    String content = mYAxis.formatData(columnDataList.get(i));
+                    pointStyle.setTextSize(24);
+                    pointStyle.setTextColor(pointColor);
+                    //X坐标=坐标点-文本宽度/2；Y坐标=坐标点-文本高度/2；
+                    canvas.drawText(content, xCurrent - pointStyle.fillPaint(paint).measureText(content) / 2, yCurrent - textHeight / 2, pointStyle.fillPaint(paint));
+                }
+                //绘制折线和曲线
+                if (i < columnDataList.size() - 1) {
+                    lineStyle.setColor(pointColor);
+                    //下一个坐标点
+                    int xNext = (int) (zoomRect.left + (startIndex + 1) * perWidth);
+                    int yNext = (int) (zoomRect.bottom - mYAxis.getYHeightByValue(chartData, zoomRect, columnDataList.get(i + 1)));
+                    if (lineModel == LINE_MODEL) {
+                        canvas.drawLine(xCurrent, yCurrent, xNext, yNext, lineStyle.fillPaint(paint));
+                    } else if (lineModel == CURVE_MODEL) {
+                        //中心点
+                        int xMid = (xCurrent + xNext) / 2;
+                        Path path = new Path();
+                        path.moveTo(xCurrent, yCurrent);
+                        //贝塞尔曲线
+                        path.cubicTo(xMid, yCurrent, xMid, yNext, xNext, yNext);
+                        canvas.drawPath(path, lineStyle.fillPaint(paint));
+                    } else {
+                        Log.i(LineChart.class.getName(), "lineModel=" + lineModel + " is unknown");
+                    }
                 }
             }
-
         }
     }
 
     public void setLineModel(int lineModel) {
         this.lineModel = lineModel;
-
     }
 
 

@@ -23,10 +23,6 @@ public abstract class AxisBase<T> implements IAxis<T> {
      */
     private FontStyle scaleTextStyle;
     /**
-     * 是否线形图
-     */
-    private boolean isLine;
-    /**
      * 是否显示X轴刻度线
      */
     private boolean showXScaleLine;
@@ -83,13 +79,6 @@ public abstract class AxisBase<T> implements IAxis<T> {
         this.scaleTextStyle = scaleTextStyle;
     }
 
-    public boolean isLine() {
-        return isLine;
-    }
-
-    public void setLine(boolean line) {
-        isLine = line;
-    }
 
     public boolean isShowXScaleLine() {
         return showXScaleLine;

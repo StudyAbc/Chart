@@ -12,15 +12,15 @@ import android.view.View;
 import com.jiangfeng.chart.component.XAxis;
 import com.jiangfeng.chart.component.YAxis;
 import com.jiangfeng.chart.data.ChartData;
-import com.jiangfeng.chart.data.ColumnData;
 import com.jiangfeng.chart.listener.OnChartChangeListener;
+import com.jiangfeng.chart.listener.OnClickColumnListener;
 import com.jiangfeng.chart.matrix.MatrixHelper;
 import com.jiangfeng.chart.util.DensityUtil;
 
 /**
  * 线形图和柱状图的父类;
  */
-public abstract class BarLineChartBase<T extends ColumnData> extends View implements IProvider, OnChartChangeListener {
+public abstract class BarLineChartBase<T> extends BaseChart implements OnChartChangeListener {
     private final String TAG = BarLineChartBase.class.getName();
     /**
      * 横坐标轴
@@ -60,9 +60,13 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
      */
     private boolean mShowPoint;
     /**
+     * 显示坐标点的值
+     */
+    private boolean mShowPointValue;
+    /**
      * 手势辅助类
      */
-    private MatrixHelper mMatrixHelper;
+    private MatrixHelper<T> mMatrixHelper;
 
     public BarLineChartBase(Context context) {
         super(context);
@@ -86,11 +90,10 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
         mChartRect = new Rect();
         mContext = context;
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        mMatrixHelper = new MatrixHelper(context);
+        mMatrixHelper = new MatrixHelper<T>(context);
         mMatrixHelper.setOnChartChangeListener(this);
-
-
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -99,38 +102,17 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
             computeChartRect();
             //绘制坐标轴
             mXAxis.drawAxis(canvas, mPaint, mChartRect, mChartData);
-            mXAxis.drawScaleText(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
-            if (mXAxis.isShowXScaleLine()) {
-                mXAxis.drawScaleLine(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
-            }
+            mXAxis.drawScale(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
+
             //设置Y轴刻度线条数
             mYAxis.drawAxis(canvas, mPaint, mChartRect, mChartData);
-            mYAxis.drawScaleText(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
-            if (mYAxis.isShowYScaleLine()) {
-                mYAxis.drawScaleLine(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
-            }
+            mYAxis.drawScale(canvas, mPaint, mChartRect, mMatrixHelper, mChartData);
+
             //绘制坐标点，和图表
             drawProvider(canvas, mPaint, mChartRect, mChartData);
         }
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    }
-
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        if (changed) {
-
-        }
-        super.onLayout(changed, left, top, right, bottom);
-    }
-
-    @Override
-    public void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData chartData) {
-        drawProviderValue(canvas, paint, chartRect, chartData);
-    }
 
     /**
      * 绘制坐标点，线形图或柱状图
@@ -140,7 +122,7 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
      * @param chartRect 图表范围
      * @param chartData 图表数据
      */
-    abstract void drawProviderValue(Canvas canvas, Paint paint, Rect chartRect, ChartData chartData);
+    abstract void drawProvider(Canvas canvas, Paint paint, Rect chartRect, ChartData<T> chartData);
 
 
     /**
@@ -167,7 +149,6 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mMatrixHelper.handlerTouchEvent(event);
-
         return true;
     }
 
@@ -181,6 +162,10 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
     public void onChartChange(float translateX, float translateY) {
         Log.i(TAG, "--translateX:" + translateX + "--translteY:" + translateY);
         invalidate();
+    }
+
+    public void setOnClickColumnListener(OnClickColumnListener<T> onClickColumnListener) {
+        mMatrixHelper.setClickColumnListener(onClickColumnListener);
     }
 
     public void setShowXScaleLine(boolean showXScaleLine) {
@@ -214,6 +199,7 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
 
     public void setChartData(ChartData<T> chartData) {
         this.mChartData = chartData;
+        mMatrixHelper.setChartData(mChartData);
         invalidate();
     }
 
@@ -240,7 +226,15 @@ public abstract class BarLineChartBase<T extends ColumnData> extends View implem
         mMatrixHelper.setZoom(isZoom);
     }
 
-    public MatrixHelper getMatrixHelper(){
+    public MatrixHelper getMatrixHelper() {
         return mMatrixHelper;
+    }
+
+    public boolean isShowPointValue() {
+        return mShowPointValue;
+    }
+
+    public void setShowPointValue(boolean showPointValue) {
+        this.mShowPointValue = showPointValue;
     }
 }

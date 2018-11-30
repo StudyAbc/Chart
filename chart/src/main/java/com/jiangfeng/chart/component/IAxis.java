@@ -5,7 +5,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.jiangfeng.chart.data.ChartData;
-import com.jiangfeng.chart.data.ColumnData;
 import com.jiangfeng.chart.data.format.IFormat;
 import com.jiangfeng.chart.matrix.MatrixHelper;
 
@@ -16,25 +15,18 @@ public interface IAxis<T> {
      * @param canvas 画布
      * @param paint  画笔
      */
-    void drawAxis(Canvas canvas, Paint paint, Rect chartRect, ChartData<ColumnData> chartData);
+    void drawAxis(Canvas canvas, Paint paint, Rect chartRect, ChartData<T> chartData);
 
     /**
-     * 画刻度
-     *
-     * @param canvas 画布
-     * @param paint  画笔
-     */
-    void drawScaleText(Canvas canvas, Paint paint, Rect chartRect,MatrixHelper helper, ChartData<ColumnData> chartData);
-
-    /**
-     * 绘制刻度线
+     * 绘制刻度
      *
      * @param canvas    画布
      * @param paint     画笔
      * @param chartRect 图表范围
+     * @param helper    图表缩放处理
      * @param chartData 图表数据
      */
-    void drawScaleLine(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper, ChartData<ColumnData> chartData);
+    void drawScale(Canvas canvas, Paint paint, Rect chartRect, MatrixHelper helper, ChartData<T> chartData);
 
     /**
      * 设置格式化

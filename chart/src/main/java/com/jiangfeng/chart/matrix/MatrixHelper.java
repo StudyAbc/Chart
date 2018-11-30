@@ -10,15 +10,20 @@ import android.view.ViewConfiguration;
 import android.view.ViewParent;
 import android.widget.Scroller;
 
-import com.jiangfeng.chart.charts.BarLineChartBase;
+import com.jiangfeng.chart.charts.BaseChart;
+import com.jiangfeng.chart.data.ChartData;
 import com.jiangfeng.chart.listener.OnChartChangeListener;
+import com.jiangfeng.chart.listener.OnClickColumnListener;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by LWH
  * 2018/11/16 14:32
  * 图表缩放处理
  */
-public class MatrixHelper {
+public class MatrixHelper<T> {
     private final String TAG = MatrixHelper.class.getName();
     /**
      * 最大缩放比例
@@ -75,15 +80,13 @@ public class MatrixHelper {
      */
     private Rect mOriginalRect;
     /**
-     * 宽缩放比
-     */
-    private float widthMultiple = 1;
-    /**
      * 图表变化监听
      */
     private OnChartChangeListener chartChangeListener;
+    private OnClickColumnListener<T> clickColumnListener;
+    private ChartData<T> chartData;
 
-    public MatrixHelper(Context context) {
+    public MatrixHelper(final Context context) {
         mScroller = new Scroller(context);
         //UI标准常量类
         ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
@@ -126,6 +129,7 @@ public class MatrixHelper {
             public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
                 mTranslateX += distanceX;
                 mTranslateY += distanceY;
+                Log.i(TAG, "---GestureDetector mTranslateY:" + mTranslateX + "--mTranslateY:" + mTranslateY);
                 notifyViewChanged();
                 return true;
             }
@@ -155,10 +159,38 @@ public class MatrixHelper {
 
             //单击
             @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                return super.onSingleTapUp(e);
+            public boolean onSingleTapUp(MotionEvent event) {
+                int index = indexOfClick((int) event.getX(), (int) event.getY(), chartData);
+                if (clickColumnListener != null && index != -1) {
+                    clickColumnListener.onClickColumn(index, String.valueOf(chartData.getxDataList().get(index)), chartData.getColumnDataList().get(index));
+                }
+                return true;
             }
         });
+
+    }
+
+    /**
+     * Created by LWH
+     * 2018/11/29 17:06
+     * 判断点击坐标在哪个区域内
+     * 滑动时把可见的图形范围，和在图表数据的索引添加到MAP集合
+     * 根据点击的坐标点判断在哪个图形范围内
+     */
+    private int indexOfClick(int x, int y, ChartData chartData) {
+        Map<Integer, Rect> scaleRectMap = chartData.getScaleData().getScaleRectMap();
+        Set<Integer> integers = scaleRectMap.keySet();
+        for (Integer integer : integers) {
+            Rect indexRect = scaleRectMap.get(integer);
+            if (indexRect != null && indexRect.contains(x, y)) {
+                return integer;
+            }
+        }
+        return -1;
+    }
+
+    public void setClickColumnListener(OnClickColumnListener<T> clickColumnListener) {
+        this.clickColumnListener = clickColumnListener;
     }
 
     public void setOnChartChangeListener(OnChartChangeListener chartChangeListener) {
@@ -192,7 +224,7 @@ public class MatrixHelper {
      *
      * @param event 触摸事件
      */
-    public void onDisallowInterceptEvent(BarLineChartBase chart, MotionEvent event) {
+    public void onDisallowInterceptEvent(BaseChart chart, MotionEvent event) {
         if (!isZoom) {
             return;
         }
@@ -247,21 +279,21 @@ public class MatrixHelper {
      * @param chartRect 图表范围
      * @return 缩放后的图表范围
      */
-    public Rect getZoomRect(Rect chartRect) {
+    public Rect getZoomRect(Rect chartRect, int xSize, int dataSize) {
         mOriginalRect = chartRect;
         Rect zoomRect = new Rect();
         int oldWidth = chartRect.width();
         int oldHeight = chartRect.height();
-        //有宽度缩放才能滑动
-        int multipeWidth = (int) (widthMultiple * oldWidth);
-        int zoomWidth = (int) (currentZoom * multipeWidth);
+        //最大可滑动宽度
+        int maxWidth = (dataSize * oldWidth) / xSize;
+        int zoomWidth = (int) (currentZoom * maxWidth);
         int zoomHeight = (int) (currentZoom * oldHeight);
         int offsetX = (int) (oldWidth * (currentZoom - 1) / 2);
         int offsetY = (int) (oldHeight * (currentZoom - 1) / 2);
         int maxTranslateLeft = (int) Math.abs(oldWidth * (currentZoom - 1) / 2);
         int maxTranslateRight = zoomWidth - offsetX - oldWidth;
         int maxTranslateY = Math.abs(zoomHeight - oldHeight) / 2;
-        Log.i(TAG, "--before left:" + zoomRect.left + "--translteX:" + mTranslateX + "--offsetX:" + offsetX);
+        Log.i(TAG, "--maxTranslateLeft:" + maxTranslateLeft + "--maxTranslateRight:" + maxTranslateRight + "--offsetX:" + offsetX + "--currentZoom:" + currentZoom);
         if (mTranslateX < -maxTranslateLeft) {
             mTranslateX = -maxTranslateLeft;
         }
@@ -279,8 +311,15 @@ public class MatrixHelper {
         zoomRect.top = chartRect.top - mTranslateY - offsetY;
         zoomRect.right = chartRect.left + zoomWidth;
         zoomRect.bottom = chartRect.top + zoomHeight;
-        Log.i(TAG, "---left:" + zoomRect.left + "--translteX:" + mTranslateX + "--offsetX:" + offsetX);
         return zoomRect;
+    }
+
+    public int getTranslateX() {
+        return mTranslateX;
+    }
+
+    public int getTranslateY() {
+        return mTranslateY;
     }
 
     /**
@@ -297,11 +336,7 @@ public class MatrixHelper {
         isZoom = zoom;
     }
 
-    public float getWidthMultiple() {
-        return widthMultiple;
-    }
-
-    public void setWidthMultiple(float widthMultiple) {
-        this.widthMultiple = widthMultiple;
+    public void setChartData(ChartData<T> chartData) {
+        this.chartData = chartData;
     }
 }
